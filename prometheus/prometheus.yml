@@ -1,0 +1,59 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  scrape_timeout: 10s
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - alertmanager:9093
+
+# Rule files
+rule_files:
+  - /etc/prometheus/alerts.yml
+
+# Scrape configurations
+scrape_configs:
+ 
+  # * Monitoring Stack (Self-monitoring)*
+
+
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+ 
+  # * Infrastructure Metrics *
+  
+
+  # Node Exporter - Host metrics
+  - job_name: 'node'
+    static_configs:
+      - targets: ['node-exporter:9100']
+        labels:
+          instance: 'vps'
+
+  # cAdvisor - Container metrics
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']
+
+  
+  # Application Metrics
+ 
+
+  # Example: Next.js Application with prom-client
+  # Uncomment and modify for your apps:
+  #
+  # - job_name: 'my-app'
+  #   metrics_path: '/api/metrics'
+  #   scrape_interval: 10s
+  #   scrape_timeout: 8s
+  #   static_configs:
+  #     - targets: ['my-app-container:3000']
+  #       labels:
+  #         environment: 'production'
+  #         service: 'my-app'

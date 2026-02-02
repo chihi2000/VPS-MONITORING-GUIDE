@@ -1,0 +1,51 @@
+global:
+  # SMTP configuration for email alerts
+  smtp_smarthost: 'smtp.gmail.com:587'
+  smtp_from: 'alerts@yourdomain.com'
+  smtp_auth_username: 'your-email@gmail.com'
+  smtp_auth_password: 'your-app-password'  # Use Gmail App Password, not regular password
+  smtp_require_tls: true
+
+# Alert routing
+route:
+  group_by: ['alertname', 'severity']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 4h
+  receiver: 'email'
+
+  routes:
+    # Critical alerts - shorter repeat interval
+    - match:
+        severity: critical
+      receiver: 'email'
+      repeat_interval: 1h
+
+# Inhibition rules - suppress lower severity if higher exists
+inhibit_rules:
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'instance']
+
+# Receivers
+receivers:
+  - name: 'email'
+    email_configs:
+      - to: 'my@gmail.com'
+        send_resolved: true
+        headers:
+          subject: '[{{ .Status | toUpper }}] {{ .GroupLabels.alertname }}'
+
+  # Optional: Slack integration
+  # - name: 'slack'
+  #   slack_configs:
+  #     - api_url: 'https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK'
+  #       channel: '#alerts'
+  #       send_resolved: true
+
+  # Optional: PagerDuty integration
+  # - name: 'pagerduty'
+  #   pagerduty_configs:
+  #     - service_key: 'your-pagerduty-service-key'

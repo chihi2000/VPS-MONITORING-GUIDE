@@ -1,0 +1,20 @@
+# Alertmanager config contains secrets
+alertmanager/alertmanager.yml
+
+# Data directories (if accidentally created locally)
+*_data/
+
+# Environment files
+.env
+*.env
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
